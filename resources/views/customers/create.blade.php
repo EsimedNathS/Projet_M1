@@ -52,7 +52,7 @@
 
             <!-- Submit Button -->
             <div class="flex justify-between">
-                <a href="{{ route('customers.index') }}" class="text-gray-400 hover:text-gray-200">Cancel</a>
+                <a href="{{ route('customers.index') }}" class="text-red-400 hover:text-red-600">Cancel</a>
                 <button type="submit"
                     class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-500 transition-colors">Save</button>
             </div>

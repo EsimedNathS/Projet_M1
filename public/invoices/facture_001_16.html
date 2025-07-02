@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+            <html lang="fr">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Facture 001</title>
+                <style>
+                    body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+                    .invoice { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
+                    .header h1 { color: #333; margin: 0; }
+                    .info-section { display: flex; justify-content: space-between; margin-bottom: 30px; }
+                    .info-box { width: 45%; }
+                    .info-box h3 { background: #f0f0f0; padding: 10px; margin: 0 0 10px 0; border-left: 4px solid #007cba; }
+                    .info-row { margin-bottom: 8px; }
+                    .label { font-weight: bold; display: inline-block; width: 120px; }
+                    .lines-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    .lines-table th { background: #333; color: white; padding: 12px; text-align: left; }
+                    .lines-table td { padding: 12px; border-bottom: 1px solid #ddd; }
+                    .lines-table tr:nth-child(even) { background: #f9f9f9; }
+                    .total-section { text-align: right; margin-top: 20px; border-top: 2px solid #333; padding-top: 15px; }
+                    .total-row { margin-bottom: 5px; }
+                    .final-total { font-size: 1.2em; font-weight: bold; color: #007cba; }
+                    .status { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-weight: bold; }
+                    .status-paid { background: #28a745; }
+                    .status-pending { background: #ffc107; color: #333; }
+                    .status-overdue { background: #dc3545; }
+                    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center; color: #666; }
+                </style>
+            </head>
+            <body>
+                <div class="invoice">
+                    <div class="header">
+                        <h1>FACTURE</h1>
+                        <h2>N° 001</h2>
+                        <div class="status status-Éditée">
+                            Statut: Éditée
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-box">
+                            <h3>CLIENT</h3>
+                            <div class="info-row">
+                                <span class="label">Nom:</span>
+                                Alice Dupont
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Email:</span>
+                                alice@example.com
+                            </div>
+                            <div class="info-row">
+                                <span class="label">Projet:</span>
+                                Projet Beta
+                            </div>
+                        </div>
+
+                        <div class="info-box">
+                            <h3>FACTURE</h3>
+                            <div class="info-row">
+                                <span class="label">Date édition:</span>
+                                01/07/2025
+                            </div>
+                            <div class="info-row"><span class="label">Date paiement:</span>30/06/2025</div>
+                            
+                        </div>
+                    </div>
+
+                    <table class="lines-table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th>Prix unitaire</th>
+                                <th>Quantité</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody><tr>
+                    <td>Back Web</td>
+                    <td>450.00 €</td>
+                    <td>1</td>
+                    <td>450.00 €</td>
+                </tr><tr>
+                    <td>Front Web</td>
+                    <td>350.00 €</td>
+                    <td>2</td>
+                    <td>700.00 €</td>
+                </tr></tbody>
+                    </table>
+
+                    <div class="total-section">
+                        <div class="total-row">Sous-total: 1,150.00 €</div>
+                        <div class="total-row">TVA (20%): 230.00 €</div>
+                        <div class="total-row final-total">TOTAL TTC: 1,380.00 €</div>
+                    </div>
+
+                    <div class="footer">
+                        <p>Facture générée automatiquement le 01/07/2025 à 11:23</p>
+                        <p>Fichier: facture_001_16.html</p>
+                    </div>
+                </div>
+            </body>
+        </html>

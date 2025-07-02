@@ -22,19 +22,25 @@ use Illuminate\Database\Eloquent\Model;
 class ExpensesLine extends Model
 {
 	protected $table = 'expenses_lines';
-	protected $primaryKey = 'line_id';
 	public $timestamps = false;
 
 	protected $casts = [
-		'expense_id' => 'int'
+		'expense_id',
+		'wording',
+        'unit_price',
+        'quantity'
 	];
 
 	protected $fillable = [
-		'expense_id'
+		'expense_id',
+		'wording',
+		'unit_price',
+		'quantity'
 	];
+
 
 	public function expenses()
 	{
-		return $this->hasMany(Expense::class, 'expense_line_id');
+		return $this->hasMany(Expenses::class, 'expense_line_id');
 	}
 }

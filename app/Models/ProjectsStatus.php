@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
 class ProjectsStatus extends Model
 {
 	protected $table = 'projects_status';
-	protected $primaryKey = 'status_id';
 	public $timestamps = false;
 
 	protected $fillable = [
@@ -31,6 +30,6 @@ class ProjectsStatus extends Model
 
 	public function projects()
 	{
-		return $this->hasMany(Project::class, 'status_id');
+		return $this->hasMany(Project::class);
 	}
 }

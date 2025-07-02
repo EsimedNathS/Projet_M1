@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
 class ExpensesStatus extends Model
 {
 	protected $table = 'expenses_status';
-	protected $primaryKey = 'status_id';
 	public $timestamps = false;
 
 	protected $fillable = [

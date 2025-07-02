@@ -1,13 +1,10 @@
 <?php
-
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 use App\Models\Customer;
 
 class CustomersController extends Controller
 {
-
     /**
      * Display a listing of the customers.
      */
@@ -15,7 +12,19 @@ class CustomersController extends Controller
     {
         $search = $request->input('search');
         $sort = $request->input('sort', 'name'); // Tri par défaut sur le nom
-
+        $direction = $request->input('direction', 'asc'); // Direction par défaut croissante
+        
+        // Validation des colonnes autorisées pour le tri
+        $allowedSorts = ['name', 'email', 'phone', 'address'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'name';
+        }
+        
+        // Validation de la direction
+        if (!in_array($direction, ['asc', 'desc'])) {
+            $direction = 'asc';
+        }
+        
         $customers = Customer::query()
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', '%' . $search . '%')
@@ -23,13 +32,12 @@ class CustomersController extends Controller
                     ->orWhere('phone', 'like', '%' . $search . '%')
                     ->orWhere('address', 'like', '%' . $search . '%');
             })
-            ->orderBy($sort)
+            ->orderBy($sort, $direction)
             ->withCount('projects')
             ->paginate(10);
-
+        
         return view('customers.index', compact('customers', 'search'));
     }
-
 
     /**
      * Show the form for creating a new customer.
@@ -93,5 +101,19 @@ class CustomersController extends Controller
         $customer->delete();
 
         return redirect()->route('customers.index')->with('success', 'Customer deleted successfully.');
+    }
+
+    public function show(Customer $customer)
+    {
+        // Récupérer les projets du customer avec leurs informations
+        $projects = $customer->projects()->with('status')->get();
+
+        // Calculer les statistiques (tu peux adapter selon tes besoins)
+        $caAnnuel = $projects->sum('montant_total') ?? 0; // Suppose que tu as un champ montant_total
+        $caAnnuelMax = 100000; // À définir selon ta logique
+        $caRestant = $caAnnuelMax - $caAnnuel;
+        $facturesNonEnvoyees = 0; // À calculer selon ta logique
+
+        return view('customers.show', compact('customer', 'projects', 'caAnnuel', 'caAnnuelMax', 'caRestant', 'facturesNonEnvoyees'));
     }
 }

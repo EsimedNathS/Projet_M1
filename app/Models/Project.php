@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Project
  * 
- * @property int $project_id
+ * @property int $id
  * @property int $client_id
  * @property int|null $status_id
  * @property string|null $name
@@ -27,18 +27,17 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
 	protected $table = 'projects';
-	protected $primaryKey = 'project_id';
 	public $timestamps = false;
 
 	protected $casts = [
-		'client_id' => 'int',
+		'customer_id' => 'int',
 		'status_id' => 'int',
 		'list_price' => 'float',
 		'discount' => 'float'
 	];
 
 	protected $fillable = [
-		'client_id',
+		'customer_id',
 		'status_id',
 		'name',
 		'list_price',
@@ -47,16 +46,21 @@ class Project extends Model
 
 	public function customer()
 	{
-		return $this->belongsTo(Customer::class, 'project_id');
-	}
-
-	public function quote()
-	{
-		return $this->belongsTo(Quote::class, 'project_id');
+		return $this->belongsTo(Customer::class);
 	}
 
 	public function status()
 	{
-		return $this->belongsTo(ProjectsStatus::class, 'status_id');
+		return $this->belongsTo(ProjectsStatus::class);
+	}
+
+	public function quotes()
+	{
+		return $this->hasMany(Quotes::class);
+	}
+
+	public function getTotalQuotesAttribute()
+	{
+		return $this->quotes()->sum('amount');
 	}
 }

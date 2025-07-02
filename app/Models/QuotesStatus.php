@@ -22,7 +22,6 @@ use Illuminate\Database\Eloquent\Model;
 class QuotesStatus extends Model
 {
 	protected $table = 'quotes_status';
-	protected $primaryKey = 'status_id';
 	public $timestamps = false;
 
 	protected $fillable = [
@@ -31,6 +30,6 @@ class QuotesStatus extends Model
 
 	public function quotes()
 	{
-		return $this->hasMany(Quote::class, 'status_id');
+		return $this->hasMany(Quotes::class, 'status_id');
 	}
 }

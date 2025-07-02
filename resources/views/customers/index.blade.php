@@ -18,15 +18,10 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
-
-                    <!-- Sort Dropdown -->
-                    <select name="sort" onchange="this.form.submit()"
-                        class="ml-4 bg-white text-black px-5 py-2 pr-10 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 cursor-pointer">
-                        <option value="">Sort by:</option>
-                        <option value="name" {{ request('sort') == 'name' ? 'selected' : '' }}>Name</option>
-                        <option value="email" {{ request('sort') == 'email' ? 'selected' : '' }}>Email</option>
-                        <option value="address" {{ request('sort') == 'address' ? 'selected' : '' }}>Address</option>
-                    </select>
+                    
+                    <!-- Garder les paramètres de tri dans la recherche -->
+                    <input type="hidden" name="sort" value="{{ request('sort') }}">
+                    <input type="hidden" name="direction" value="{{ request('direction') }}">
                 </form>
 
                 <!-- Add Button -->
@@ -40,17 +35,110 @@
             <table class="w-full">
                 <thead>
                     <tr class="border-b border-gray-600">
-                        <th class="py-4 px-2 text-left text-red-400">Name</th>
-                        <th class="py-4 px-2 text-left text-red-400">Email</th>
-                        <th class="py-4 px-2 text-left text-red-400">Phone</th>
-                        <th class="py-4 px-2 text-left text-red-400">Address</th>
+                        <!-- Name Column -->
+                        <th class="py-4 px-2 text-left text-red-400">
+                            <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'name', 'direction' => (request('sort') == 'name' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
+                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Name</span>
+                                @if(request('sort') == 'name')
+                                    @if(request('direction') == 'asc')
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="w-4 h-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
+                            </a>
+                        </th>
+
+                        <!-- Email Column -->
+                        <th class="py-4 px-2 text-left text-red-400">
+                            <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'email', 'direction' => (request('sort') == 'email' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
+                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Email</span>
+                                @if(request('sort') == 'email')
+                                    @if(request('direction') == 'asc')
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="w-4 h-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
+                            </a>
+                        </th>
+
+                        <!-- Phone Column -->
+                        <th class="py-4 px-2 text-left text-red-400">
+                            <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'phone', 'direction' => (request('sort') == 'phone' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
+                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Phone</span>
+                                @if(request('sort') == 'phone')
+                                    @if(request('direction') == 'asc')
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="w-4 h-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
+                            </a>
+                        </th>
+
+                        <!-- Address Column -->
+                        <th class="py-4 px-2 text-left text-red-400">
+                            <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'address', 'direction' => (request('sort') == 'address' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
+                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Address</span>
+                                @if(request('sort') == 'address')
+                                    @if(request('direction') == 'asc')
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    @endif
+                                @else
+                                    <svg class="w-4 h-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                @endif
+                            </a>
+                        </th>
+
                         <th class="py-4 px-2 text-left text-red-400">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-300">
                     @foreach ($customers as $customer)
                         <tr class="border-b border-gray-700 hover:bg-gray-700 transition-colors">
-                            <td class="py-4 px-2">{{ $customer->name }}</td>
+                            <td class="py-4 px-2">
+                                <a href="{{ route('customers.show', $customer) }}" 
+                                class="text-red-400 hover:text-red-300 hover:underline transition-colors">
+                                    {{ $customer->name }}
+                                </a>
+                            </td>
                             <td class="py-4 px-2">{{ $customer->email }}</td>
                             <td class="py-4 px-2">{{ $customer->phone }}</td>
                             <td class="py-4 px-2">{{ $customer->address }}</td>
@@ -76,7 +164,7 @@
 
         <!-- Pagination -->
         <div class="mt-8">
-            {{ $customers->appends(['search' => request('search'), 'sort' => request('sort')])->links() }}
+            {{ $customers->appends(request()->all())->links() }}
         </div>
     </div>
 </div>

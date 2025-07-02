@@ -12,9 +12,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Class Customer
  * 
- * @property int $customer_id
+ * @property int $id
  * @property int|null $user_id
- * @property int|null $project_id
  * @property string|null $name
  * @property string|null $denomination
  * @property Carbon|null $required_date
@@ -27,18 +26,15 @@ use Illuminate\Database\Eloquent\Model;
 class Customer extends Model
 {
 	protected $table = 'customers';
-	protected $primaryKey = 'customer_id';
 	public $timestamps = false;
 
 	protected $casts = [
 		'user_id' => 'int',
-		'project_id' => 'int',
 		'required_date' => 'datetime'
 	];
 
 	protected $fillable = [
 		'user_id',
-		'project_id',
 		'name',
 		'denomination',
 		'required_date'
@@ -51,6 +47,6 @@ class Customer extends Model
 
 	public function projects()
 	{
-		return $this->hasMany(Project::class, 'project_id');
+		return $this->hasMany(Project::class);
 	}
 }

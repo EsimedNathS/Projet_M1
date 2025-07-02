@@ -15,7 +15,13 @@
                 Dashboard
             </a>
             <nav class="space-x-6 flex items-center">
-                <a href="#" class="hover:text-gray-300 transition-colors duration-300">Expenses</a>
+                @auth
+                    @if(auth()->user()->admin)
+                        <a href="{{ route('admin.users.index') }}" class="text-sm text-white hover:underline">Administration</a>
+                    @endif
+                @endauth
+                <a href="{{ route('quotes.index') }}" class="hover:text-gray-300 transition-colors duration-300">Quotes</a>
+                <a href="{{ route('expenses.index') }}" class="hover:text-gray-300 transition-colors duration-300">Expenses</a>
                 <a href="{{ route('projects.index') }}" class="hover:text-gray-300 transition-colors duration-300">Projects</a>
                 <a href="{{ route('customers.index') }}" class="hover:text-gray-300 transition-colors duration-300">Customers</a>
                 <a href="#" class="hover:text-gray-300 transition-colors duration-300">Logout</a>
@@ -27,6 +33,7 @@
         <!-- Page Content -->
         <main class="flex-grow p-6">
             @yield('content')
+            @stack('scripts')
         </main>
 
         <!-- Footer -->
