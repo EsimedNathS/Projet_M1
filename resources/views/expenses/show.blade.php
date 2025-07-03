@@ -16,7 +16,7 @@
                 <a href="{{ route('expenses.edit', $expense->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors">
                     Modifier
                 </a>
-                <a href="{{ route('expenses.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                <a href="{{ url()->previous() }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
                     Retour
                 </a>
                 <form action="{{ route('expenses.destroy', $expense->id) }}" method="POST" class="inline">

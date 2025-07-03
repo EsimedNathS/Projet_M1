@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-2xl mx-auto mt-12 p-6 bg-gray-900 rounded-2xl shadow-lg text-white">
-    <h2 class="text-2xl font-semibold mb-6">Ajouter une nouvelle quote</h2>
+    <h2 class="text-2xl font-semibold mb-6">Ajouter un nouveau devis</h2>
 
     <form action="{{ route('quotes.store') }}" method="POST">
         @csrf

@@ -5,7 +5,7 @@
     <div class="bg-gray-800 rounded-3xl p-8 shadow-2xl">
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-medium text-red-400">Tous les devis</h1>
+            <h1 class="text-2xl font-medium text-red-400">Devis</h1>
 
             <div class="flex items-center space-x-4">
                 <!-- Search -->

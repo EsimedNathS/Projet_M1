@@ -12,11 +12,13 @@ use Illuminate\Database\Eloquent\Model;
  * Class Project
  * 
  * @property int $id
- * @property int $client_id
+ * @property int $customer_id
  * @property int|null $status_id
  * @property string|null $name
  * @property float|null $list_price
  * @property float|null $discount
+ *  * @property Carbon|null $date_start
+ *  * @property Carbon|null $date_end
  * 
  * @property Customer $customer
  * @property Quote $quote
@@ -29,19 +31,26 @@ class Project extends Model
 	protected $table = 'projects';
 	public $timestamps = false;
 
+	protected $dates = [
+		'date_start',
+		'date_end',
+	];
+
 	protected $casts = [
 		'customer_id' => 'int',
 		'status_id' => 'int',
 		'list_price' => 'float',
-		'discount' => 'float'
+		'discount' => 'float',
+		'date_start' => 'datetime',
+    	'date_end' => 'datetime',
 	];
 
 	protected $fillable = [
 		'customer_id',
 		'status_id',
 		'name',
-		'list_price',
-		'discount'
+		'date_start',
+		'date_end'
 	];
 
 	public function customer()

@@ -19,7 +19,7 @@
                 <a href="{{ route('quotes.edit', $quote->id) }}" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition-colors">
                     Modifier
                 </a>
-                <a href="{{ route('quotes.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                <a href="{{ url()->previous() }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
                     Retour
                 </a>
             </div>
@@ -215,7 +215,7 @@
                 @if($quote->status && $quote->status->name == 'Accepté')
                 <a href="{{ route('expenses.create', ['quote' => $quote->id]) }}" 
                    class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-500 transition-colors">
-                    Ajouter une dépense
+                    Ajouter une facture
                 </a>
                 @endif
             </div>

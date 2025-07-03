@@ -5,7 +5,7 @@
     <div class="bg-gray-800 rounded-3xl p-8 shadow-2xl">
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-medium text-red-400">All Projects</h1>
+            <h1 class="text-2xl font-medium text-red-400">Projets</h1>
 
             <div class="flex items-center space-x-4">
                 <!-- Search -->
@@ -22,27 +22,26 @@
                     <!-- Garder les paramètres de tri et filtres dans la recherche -->
                     <input type="hidden" name="sort" value="{{ request('sort') }}">
                     <input type="hidden" name="direction" value="{{ request('direction') }}">
-                    @if(request('status'))
-                        @foreach(request('status') as $status)
-                            <input type="hidden" name="status[]" value="{{ $status }}">
-                        @endforeach
-                    @endif
+                    <!-- Les status seront gérés par JavaScript -->
+                    <div id="hidden-status-inputs"></div>
                 </form>
 
                 <!-- Add Button -->
                 <a href="{{ route('projects.create') }}"
-                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">Add Project
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">Ajouter un Projet
                 </a>
             </div>
         </div>
 
         <!-- Filtres de statut -->
         <div class="mb-6 relative">
-            <form action="{{ route('projects.index') }}" method="GET" class="flex flex-wrap items-center gap-4">
+            <form action="{{ route('projects.index') }}" method="GET" class="flex flex-wrap items-center gap-4" id="filter-form">
                 <!-- Garder les autres paramètres -->
                 <input type="hidden" name="search" value="{{ request('search') }}">
                 <input type="hidden" name="sort" value="{{ request('sort') }}">
                 <input type="hidden" name="direction" value="{{ request('direction') }}">
+                <!-- Container pour les inputs status cachés -->
+                <div id="status-inputs-container"></div>
 
                 <div class="relative">
                     <button type="button" onclick="toggleDropdown()" class="bg-gray-700 text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-600 flex items-center">
@@ -59,12 +58,8 @@
                             @foreach($project_status as $status)
                                 <label class="flex items-center space-x-2 cursor-pointer hover:bg-gray-600 p-1 rounded">
                                     <input type="checkbox" name="status[]" value="{{ $status->id }}"
-                                        {{ 
-                                            request()->filled('status') 
-                                                ? (in_array($status->id, request('status', [])) ? 'checked' : '') 
-                                                : ($status->id == $defaultStatusId ? 'checked' : '')
-                                        }}
-                                        class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500">
+                                        data-status-id="{{ $status->id }}"
+                                        class="w-4 h-4 text-red-600 bg-gray-100 border-gray-300 rounded focus:ring-red-500 status-checkbox">
                                     <span class="text-gray-300">{{ $status->name }}</span>
                                 </label>
                             @endforeach
@@ -83,7 +78,7 @@
                             
                             <!-- Boutons de validation -->
                             <div class="flex space-x-2 pt-2">
-                                <button type="submit" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm transition-colors">
+                                <button type="button" onclick="applyFilters()" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded text-sm transition-colors">
                                     Appliquer
                                 </button>
                                 <button type="button" onclick="closeDropdown()" class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded text-sm transition-colors">
@@ -96,7 +91,6 @@
             </form>
         </div>
 
-
         <!-- Table -->
         <div class="overflow-x-auto">
             <table class="w-full">
@@ -104,9 +98,8 @@
                     <tr class="border-b border-gray-600">
                         <!-- Project Name Column -->
                         <th class="py-4 px-2 text-left text-red-400">
-                            <a href="{{ route('projects.index', array_merge(request()->all(), ['sort' => 'name', 'direction' => (request('sort') == 'name' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
-                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Project Name</span>
+                            <a href="javascript:void(0);" onclick="sortTable('name')" class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Nom du projet</span>
                                 @if(request('sort') == 'name')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -127,9 +120,8 @@
 
                         <!-- Customer Column -->
                         <th class="py-4 px-2 text-left text-red-400">
-                            <a href="{{ route('projects.index', array_merge(request()->all(), ['sort' => 'customer', 'direction' => (request('sort') == 'customer' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
-                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Customer</span>
+                            <a href="javascript:void(0);" onclick="sortTable('customer')" class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Clients</span>
                                 @if(request('sort') == 'customer')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -150,9 +142,8 @@
 
                         <!-- Status Column -->
                         <th class="py-4 px-2 text-left text-red-400">
-                            <a href="{{ route('projects.index', array_merge(request()->all(), ['sort' => 'status', 'direction' => (request('sort') == 'status' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
-                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Status</span>
+                            <a href="javascript:void(0);" onclick="sortTable('status')" class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Statuts</span>
                                 @if(request('sort') == 'status')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -173,9 +164,8 @@
 
                         <!-- Start Date Column -->
                         <th class="py-4 px-2 text-left text-red-400">
-                            <a href="{{ route('projects.index', array_merge(request()->all(), ['sort' => 'date_start', 'direction' => (request('sort') == 'date_start' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
-                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Start Date</span>
+                            <a href="javascript:void(0);" onclick="sortTable('date_start')" class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Date début</span>
                                 @if(request('sort') == 'date_start')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -196,9 +186,8 @@
 
                         <!-- End Date Column -->
                         <th class="py-4 px-2 text-left text-red-400">
-                            <a href="{{ route('projects.index', array_merge(request()->all(), ['sort' => 'date_end', 'direction' => (request('sort') == 'date_end' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
-                               class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>End Date</span>
+                            <a href="javascript:void(0);" onclick="sortTable('date_end')" class="flex items-center space-x-1 hover:text-red-300 transition-colors">
+                                <span>Date fin</span>
                                 @if(request('sort') == 'date_end')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -254,11 +243,11 @@
                             <td class="py-4 px-2">{{ $project->date_start ?? '-' }}</td>
                             <td class="py-4 px-2">{{ $project->date_end ?? '-' }}</td>
                             <td class="py-4 px-2 flex space-x-2">
-                                <a href="{{ route('projects.edit', $project) }}" class="text-blue-400 hover:text-blue-300">Edit</a>
+                                <a href="{{ route('projects.edit', $project) }}" class="text-blue-400 hover:text-blue-300">Modifier</a>
                                 <form action="{{ route('projects.destroy', $project) }}" method="POST" onsubmit="return confirm('Are you sure?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-400 hover:text-red-300">Delete</button>
+                                    <button type="submit" class="text-red-400 hover:text-red-300">Supprimer</button>
                                 </form>
                             </td>
                         </tr>
@@ -275,8 +264,152 @@
 </div>
 
 <script>
+const STORAGE_KEY = 'projectStatusFilter';
+const DEFAULT_STATUS_ID = '{{ $defaultStatusId }}';
+
+// Initialisation au chargement de la page
+document.addEventListener('DOMContentLoaded', function() {
+    // Vérifier si nous avons des filtres dans l'URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusParams = urlParams.getAll('status[]');
+    
+    if (statusParams.length > 0) {
+        // Si nous avons des filtres dans l'URL, les utiliser et les sauvegarder
+        saveFiltersToStorage(statusParams);
+        loadFiltersFromURL();
+    } else {
+        // Si pas de filtres dans l'URL, charger depuis localStorage et appliquer
+        loadFiltersFromStorage();
+        applyStoredFilters();
+    }
+    
+    updateHiddenInputs();
+});
+
+// Charger les filtres depuis l'URL
+function loadFiltersFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusParams = urlParams.getAll('status[]');
+    const checkboxes = document.querySelectorAll('.status-checkbox');
+    
+    checkboxes.forEach(cb => {
+        cb.checked = statusParams.includes(cb.value);
+    });
+}
+
+// Charger les filtres depuis localStorage
+function loadFiltersFromStorage() {
+    const checkboxes = document.querySelectorAll('.status-checkbox');
+    let savedFilters = getSavedFilters();
+    
+    // Si aucun filtre sauvegardé, utiliser le statut par défaut
+    if (!savedFilters || savedFilters.length === 0) {
+        savedFilters = [DEFAULT_STATUS_ID];
+        saveFiltersToStorage(savedFilters);
+    }
+    
+    // Appliquer les filtres sauvegardés
+    checkboxes.forEach(cb => {
+        cb.checked = savedFilters.includes(cb.value);
+    });
+}
+
+// Appliquer les filtres stockés automatiquement
+function applyStoredFilters() {
+    const currentFilters = getCurrentFilters();
+    
+    // Vérifier si nous avons des filtres à appliquer
+    if (currentFilters.length > 0) {
+        // Construire l'URL avec les filtres
+        const url = new URL(window.location.href);
+        
+        // Supprimer les anciens filtres de statut
+        url.searchParams.delete('status[]');
+        
+        // Ajouter les nouveaux filtres
+        currentFilters.forEach(statusId => {
+            url.searchParams.append('status[]', statusId);
+        });
+        
+        // Rediriger uniquement si l'URL est différente
+        if (url.toString() !== window.location.href) {
+            window.location.href = url.toString();
+        }
+    }
+}
+
+// Récupérer les filtres sauvegardés
+function getSavedFilters() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+        console.error('Erreur lors de la lecture du localStorage:', e);
+        return null;
+    }
+}
+
+// Sauvegarder les filtres dans localStorage
+function saveFiltersToStorage(filters) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(filters));
+    } catch (e) {
+        console.error('Erreur lors de la sauvegarde dans localStorage:', e);
+    }
+}
+
+// Obtenir les filtres actuellement sélectionnés
+function getCurrentFilters() {
+    const checkboxes = document.querySelectorAll('.status-checkbox:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// Mettre à jour les inputs cachés pour les formulaires
+function updateHiddenInputs() {
+    const currentFilters = getCurrentFilters();
+    
+    // Mettre à jour le container du formulaire de filtres
+    const filterContainer = document.getElementById('status-inputs-container');
+    if (filterContainer) {
+        filterContainer.innerHTML = '';
+        
+        currentFilters.forEach(statusId => {
+            const filterInput = document.createElement('input');
+            filterInput.type = 'hidden';
+            filterInput.name = 'status[]';
+            filterInput.value = statusId;
+            filterContainer.appendChild(filterInput);
+        });
+    }
+    
+    // Mettre à jour le container du formulaire de recherche
+    const searchContainer = document.getElementById('hidden-status-inputs');
+    if (searchContainer) {
+        searchContainer.innerHTML = '';
+        
+        currentFilters.forEach(statusId => {
+            const searchInput = document.createElement('input');
+            searchInput.type = 'hidden';
+            searchInput.name = 'status[]';
+            searchInput.value = statusId;
+            searchContainer.appendChild(searchInput);
+        });
+    }
+}
+
+// Appliquer les filtres
+function applyFilters() {
+    const currentFilters = getCurrentFilters();
+    saveFiltersToStorage(currentFilters);
+    updateHiddenInputs();
+    
+    // Soumettre le formulaire
+    document.getElementById('filter-form').submit();
+}
+
+// Basculer tous les statuts
 function toggleAllProject_status() {
-    const checkboxes = document.querySelectorAll('input[name="status[]"]');
+    const checkboxes = document.querySelectorAll('.status-checkbox');
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
     
     checkboxes.forEach(cb => {
@@ -284,15 +417,41 @@ function toggleAllProject_status() {
     });
 }
 
+// Réinitialiser au statut par défaut
 function resetToDefault() {
-    const checkboxes = document.querySelectorAll('input[name="status[]"]');
-    const defaultStatusId = '{{ $defaultStatusId }}';
+    const checkboxes = document.querySelectorAll('.status-checkbox');
     
     checkboxes.forEach(cb => {
-        cb.checked = cb.value === defaultStatusId;
+        cb.checked = cb.value === DEFAULT_STATUS_ID;
     });
 }
 
+// Gérer le tri
+function sortTable(sortField) {
+    const currentSort = '{{ request("sort") }}';
+    const currentDirection = '{{ request("direction") }}';
+    
+    let newDirection = 'asc';
+    if (currentSort === sortField && currentDirection === 'asc') {
+        newDirection = 'desc';
+    }
+    
+    // Construire l'URL avec les filtres actuels
+    const url = new URL(window.location.href);
+    url.searchParams.set('sort', sortField);
+    url.searchParams.set('direction', newDirection);
+    
+    // Ajouter les filtres de statut
+    url.searchParams.delete('status[]');
+    const currentFilters = getCurrentFilters();
+    currentFilters.forEach(statusId => {
+        url.searchParams.append('status[]', statusId);
+    });
+    
+    window.location.href = url.toString();
+}
+
+// Gérer le dropdown
 function toggleDropdown() {
     const dropdown = document.getElementById('dropdown-menu');
     const icon = document.getElementById('dropdown-icon');

@@ -16,7 +16,7 @@
                 <a href="{{ route('projects.edit', $project->id) }}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
                     Modifier
                 </a>
-                <a href="{{ route('projects.index') }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
+                <a href="{{ url()->previous() }}" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
                     Retour
                 </a>
             </div>
@@ -95,7 +95,7 @@
                         class="bg-gray-900 text-gray-400 hover:bg-gray-800 px-6 py-2 rounded-full transition-colors font-semibold"
                         onclick="switchToTab('expenses')"
                         type="button">
-                        Dépenses
+                        Factures
                     </button>
                 </div>
             </div>

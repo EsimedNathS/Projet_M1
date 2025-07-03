@@ -11,7 +11,7 @@
 
             <!-- Name -->
             <div>
-                <label for="name" class="block mb-1 text-white">Name</label>
+                <label for="name" class="block mb-1 text-white">Nom</label>
                 <input type="text" name="name" id="name" value="{{ old('name', $customer->name) }}" required
                     class="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-red-400">
             </div>
@@ -25,30 +25,23 @@
 
             <!-- Phone -->
             <div>
-                <label for="phone" class="block mb-1 text-white">Phone</label>
+                <label for="phone" class="block mb-1 text-white">Téléphone</label>
                 <input type="text" name="phone" id="phone" value="{{ old('phone', $customer->phone) }}" required
                     class="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-red-400">
             </div>
 
             <!-- Address -->
             <div>
-                <label for="address" class="block mb-1 text-white">Address</label>
+                <label for="address" class="block mb-1 text-white">Adresse</label>
                 <input type="text" name="address" id="address" value="{{ old('address', $customer->address) }}" required
-                    class="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-red-400">
-            </div>
-
-            <!-- Denomination -->
-            <div>
-                <label for="denomination" class="block mb-1 text-white">Denomination</label>
-                <input type="text" name="denomination" id="denomination" value="{{ old('denomination', $customer->denomination) }}"
                     class="w-full px-4 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-red-400">
             </div>
 
             <!-- Buttons -->
             <div class="flex justify-between items-center mt-6">
-                <a href="{{ route('customers.index') }}" class="text-red-400 hover:text-red-600">Cancel</a>
+                <a href="{{ route('customers.index') }}" class="text-red-400 hover:text-red-600">Annuler</a>
                 <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg transition-colors">
-                    Update
+                    Mettre à jour
                 </button>
             </div>
         </form>

@@ -14,28 +14,71 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        $user = auth()->user();
+
+        $userStats = [
+            'total_ca' => $user->getTotalCA(),
+            'total_expenses' => $user->getTotalExpenses(),
+            'projects_count' => $user->projects()->count(),
+            'customers_count' => $user->customers()->count(),
+            'quotes_count' => $user->quotes()->count(),
+            'expenses_count' => $user->expenses()->count(),
+        ];
+
+        return view('profile.edit', compact('user', 'userStats'));
+    }
+
+    public function show()
+    {
+        $user = auth()->user();
+
+        $userStats = [
+            'total_ca' => $user->getTotalCA(),
+            'total_expenses' => $user->getTotalExpenses(),
+            'projects_count' => $user->projects()->count(),
+            'customers_count' => $user->customers()->count(),
+            'quotes_count' => $user->quotes()->count(),
+            'expenses_count' => $user->expenses()->count(),
+        ];
+
+        return view('profile.show', compact('user', 'userStats'));
     }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // Nettoyage si virgule utilisée pour les décimales
+        if ($request->has('ca_max')) {
+            $request->merge([
+                'ca_max' => str_replace(',', '.', $request->input('ca_max'))
+            ]);
         }
 
-        $request->user()->save();
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => ['nullable', 'regex:/^\+?[0-9\s\-]{7,15}$/'],
+            'adresse' => 'nullable|string|max:500',
+            'ca_max' => ['nullable', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'charges' => ['nullable', 'integer', 'between:0,100'],
+        ], [
+            'phone.regex' => 'Le numéro de téléphone invalide',
+        ]);
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+
+        $user->update($validated);
+
+        return redirect()->route('profile.show')->with('success', 'Profil mis à jour avec succès');
     }
+
+
 
     /**
      * Delete the user's account.

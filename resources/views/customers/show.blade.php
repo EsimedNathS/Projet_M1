@@ -14,7 +14,7 @@
                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
                     Modifier
                 </a>
-                <a href="{{ route('customers.index') }}" 
+                <a href="{{ url()->previous() }}" 
                    class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition-colors">
                     Retour
                 </a>

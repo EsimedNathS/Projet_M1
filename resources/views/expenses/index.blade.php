@@ -29,7 +29,7 @@
 
                 <!-- Add Button -->
                 <a href="{{ route('expenses.create') }}"
-                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">Ajouter une dépense</a>
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">Ajouter une facture</a>
             </div>
         </div>
 
@@ -112,7 +112,7 @@
                             </td>
 
                             <td class="py-4 px-2 flex space-x-2">
-                                <a href="{{ route('expenses.destroy', $expense->id) }}" class="text-blue-400 hover:text-blue-300">Modifier</a>
+                                <a href="{{ route('expenses.edit', $expense->id) }}" class="text-blue-400 hover:text-blue-300">Modifier</a>
                                 <form action="{{ route('expenses.destroy', $expense->id) }}" method="POST" onsubmit="return confirm('Supprimer cette dépense ?');">
                                     @csrf
                                     @method('DELETE')

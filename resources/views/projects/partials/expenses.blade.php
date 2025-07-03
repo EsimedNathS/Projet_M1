@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-semibold text-white">Dépenses ({{ $expenses->count() }})</h2>
         <a href="#" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
-            Ajouter une dépense
+            Ajouter une facture
         </a>
     </div>
 
@@ -28,7 +28,7 @@
                             </td>
                             <td class="py-4 px-2">{{ $expense->type_payment }}</td>
                             <td class="py-4 px-2 flex space-x-2">
-                                <a href="#" class="text-blue-400 hover:text-blue-300">Voir</a>
+                                <a href="{{ route('expenses.show', [$expense->id]) }}" class="text-blue-400 hover:text-blue-300">Voir</a>
                                 @if(!$expense->quote_id)
                                     <form action="#" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette dépense ?');" class="inline">
                                         @csrf

@@ -56,6 +56,8 @@ class DashboardController extends Controller
     
     private function getAnnualData($year)
     {
+        $userId = auth()->id();
+        $user = auth()->user();
         $yearStart = Carbon::createFromDate($year, 1, 1)->startOfDay();
         $yearEnd = Carbon::createFromDate($year, 12, 31)->endOfDay();
         
@@ -68,6 +70,9 @@ class DashboardController extends Controller
         $expensesPaye = Expenses::with('lines')
             ->where('status_id', $statusPaye?->id)
             ->whereBetween('date_payment_effect', [$yearStart, $yearEnd])
+            ->whereHas('quote.project.customer', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+            })
             ->get();
         $caAnnuelPaye = $expensesPaye->sum(function($expense) {
             return $expense->calculateAmount();
@@ -76,6 +81,9 @@ class DashboardController extends Controller
         // Paiements en attente (factures envoyées mais non payées)
         $expensesEnvoye = Expenses::with('lines')
             ->where('status_id', $statusEnvoye?->id)
+            ->whereHas('quote.project.customer', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+            })
             ->get();
         $paiementsEnAttente = $expensesEnvoye->sum(function($expense) {
             return $expense->calculateAmount();
@@ -84,23 +92,16 @@ class DashboardController extends Controller
         // Factures éditées non envoyées
         $expensesEditee = Expenses::with('lines')
             ->where('status_id', $statusEditee?->id)
+            ->whereHas('quote.project.customer', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+            })
             ->get();
         $facturesEditees = $expensesEditee->sum(function($expense) {
             return $expense->calculateAmount();
         });
             
         // CA annuel max (toutes les factures de l'année)
-        $allExpenses = Expenses::with('lines')
-            ->whereIn('status_id', array_filter([
-                $statusEditee?->id, 
-                $statusEnvoye?->id, 
-                $statusPaye?->id
-            ]))
-            ->whereYear('created_at', $year)
-            ->get();
-        $caAnnuelMax = $allExpenses->sum(function($expense) {
-            return $expense->calculateAmount();
-        });
+        $caAnnuelMax = $user->ca_max;
             
         // CA restant à faire
         $caRestant = $caAnnuelMax - $caAnnuelPaye;
@@ -116,6 +117,8 @@ class DashboardController extends Controller
     
     private function getQuarterlyData($quarter)
     {
+        $userId = auth()->id();
+        $user = auth()->user();
         // Récupérer les statuts
         $statusPaye = ExpensesStatus::where('name', 'Payée')->first();
         $statusEnvoye = ExpensesStatus::where('name', 'Envoyée')->first();
@@ -125,6 +128,9 @@ class DashboardController extends Controller
         $expensesPayeTrimestre = Expenses::with('lines')
             ->where('status_id', $statusPaye?->id)
             ->whereBetween('date_payment_effect', [$quarter['start'], $quarter['end']])
+            ->whereHas('quote.project.customer', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+            })
             ->get();
         $caPayeTrimestre = $expensesPayeTrimestre->sum(function($expense) {
             return $expense->calculateAmount();
@@ -134,25 +140,20 @@ class DashboardController extends Controller
         $expensesEstimeTrimestre = Expenses::with('lines')
             ->where('status_id', $statusEnvoye?->id)
             ->whereBetween('date_payment_limit', [$quarter['start'], $quarter['end']])
+            ->whereHas('quote.project.customer', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+            })
             ->get();
         $caEstimeTrimestre = $expensesEstimeTrimestre->sum(function($expense) {
             return $expense->calculateAmount();
         });
+
+        $caEstimeTrimestre += $caPayeTrimestre;
             
-        // Charges à payer (factures non payées du trimestre)
-        $expensesCharges = Expenses::with('lines')
-            ->whereIn('status_id', array_filter([
-                $statusEditee?->id, 
-                $statusEnvoye?->id
-            ]))
-            ->whereBetween('date_payment_limit', [$quarter['start'], $quarter['end']])
-            ->get();
-        $chargesAPayer = $expensesCharges->sum(function($expense) {
-            return $expense->calculateAmount();
-        });
-            
-        // Charges estimées (même logique que charges à payer pour simplifier)
-        $chargesEstimees = $chargesAPayer;
+        // Charges 
+        $chargesPourcentage = $user->charges ?? 0;
+        $chargesAPayer = $caPayeTrimestre * ($chargesPourcentage / 100) ;
+        $chargesEstimees = $caEstimeTrimestre * ($chargesPourcentage / 100);
         
         return [
             'periode' => $quarter['label'],
@@ -165,6 +166,7 @@ class DashboardController extends Controller
     
     private function getMonthlyChartData($year)
     {
+        $userId = auth()->id();
         $monthlyData = [];
         $statusPaye = ExpensesStatus::where('name', 'Payée')->first();
         
@@ -175,6 +177,9 @@ class DashboardController extends Controller
             $monthlyExpenses = Expenses::with('lines')
                 ->where('status_id', $statusPaye?->id)
                 ->whereBetween('date_payment_effect', [$monthStart, $monthEnd])
+                 ->whereHas('quote.project.customer', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+                })
                 ->get();
                 
             $monthlyCA = $monthlyExpenses->sum(function($expense) {
@@ -192,6 +197,7 @@ class DashboardController extends Controller
     
     private function getAnnualChartData($year)
     {
+        $userId = auth()->id();
         $annualData = [];
         $cumulative = 0;
         $statusPaye = ExpensesStatus::where('name', 'Payée')->first();
@@ -203,6 +209,9 @@ class DashboardController extends Controller
             $monthlyExpenses = Expenses::with('lines')
                 ->where('status_id', $statusPaye?->id)
                 ->whereBetween('date_payment_effect', [$monthStart, $monthEnd])
+                ->whereHas('quote.project.customer', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+                })
                 ->get();
                 
             $monthlyCA = $monthlyExpenses->sum(function($expense) {

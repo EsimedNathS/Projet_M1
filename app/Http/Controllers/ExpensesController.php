@@ -45,35 +45,38 @@ class ExpensesController extends Controller
         $quoteId = $request->get('quote_id');
         $quote = Quotes::with(['project.customer', 'lines'])->find($quoteId);
 
+        $suggestedNumber = '001'; // Valeur par défaut
 
-        $project = $quote->project;
-        // Récupérer la plus grande valeur d'expense_number existante pour ce projet
-        $maxNumber = $project->quotes()
-            ->with('expenses')
-            ->get()
-            ->pluck('expenses')
-            ->flatten()
-            ->max(function ($expense) {
-                return (int) $expense->expense_number;
-            });
+        if ($quote && $quote->project) {
+            $project = $quote->project;
 
-        // Proposer un numéro supérieur automatiquement (ou 1 si aucune facture)
-        $suggestedNumber = str_pad(($maxNumber + 1), 3, '0', STR_PAD_LEFT);
+            // Récupérer la plus grande valeur d'expense_number pour ce projet
+            $maxNumber = $project->quotes()
+                ->with('expenses')
+                ->get()
+                ->pluck('expenses')
+                ->flatten()
+                ->max(function ($expense) {
+                    return (int) $expense->expense_number;
+                });
 
-        // Récupérer les devis disponibles pour la sélection
+            // Proposer un numéro supérieur automatiquement (ou 001 si aucune facture)
+            $suggestedNumber = str_pad(($maxNumber + 1), 3, '0', STR_PAD_LEFT);
+        }
+
+        // Récupérer tous les devis pour le sélecteur
         $availableQuotes = Quotes::with('project')->orderBy('created_at', 'desc')->get();
 
         return view('expenses.create', [
             'quote' => $quote,
             'availableQuotes' => $availableQuotes,
-            'suggestedNumber' => $suggestedNumber
+            'suggestedNumber' => $suggestedNumber,
         ]);
     }
 
+
     public function store(Request $request)
     {
-
-
         // Validation des données
         $validated = $request->validate([
             'status_id' => 'nullable|exists:expenses_status,id',
@@ -136,9 +139,13 @@ class ExpensesController extends Controller
 
     public function index(Request $request)
     {
-        $query = Expenses::with('quote.project');
-        
-        // Recherche
+        $userId = auth()->id();
+
+        $query = Expenses::with('quote.project')
+            ->whereHas('quote.project.customer', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
+
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -146,22 +153,20 @@ class ExpensesController extends Controller
                 ->orWhere('description', 'like', "%{$search}%");
             });
         }
-        
-        // Tri
+
         $sort = $request->get('sort', 'date_payment_limit');
-        $direction = $request->get('direction', 'desc'); // Desc pour avoir les plus récents en premier
-        
-        // Liste des colonnes triables (adapter selon tes vraies colonnes)
+        $direction = $request->get('direction', 'desc');
         $sortable = ['product_name', 'amount', 'date_payment_limit'];
-        
+
         if (in_array($sort, $sortable)) {
             $query->orderBy($sort, $direction);
         }
-        
+
         $expenses = $query->paginate(10);
-        
+
         return view('expenses.index', compact('expenses'));
     }
+
 
     public function destroy(Expenses $expense)
     {

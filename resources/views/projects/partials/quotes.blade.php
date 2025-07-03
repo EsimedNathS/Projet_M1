@@ -2,7 +2,7 @@
     <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-semibold text-white">Devis ({{ $quotes->count() }})</h2>
         <a href="{{ route('quotes.create', ['project' => $project->id]) }}" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">
-            Ajouter une quote
+            Ajouter un devis
         </a>
     </div>
 
@@ -40,7 +40,7 @@
                                 </span>
                             </td>   
                             <td class="py-4 px-2 flex space-x-2">
-                                <a href="{{ route('quotes.edit', [$quote->id]) }}" class="text-blue-400 hover:text-blue-300">Voir</a>
+                                <a href="{{ route('quotes.show', [$quote->id]) }}" class="text-blue-400 hover:text-blue-300">Voir</a>
                                 @if($quote->status == 'acceptée')
                                     <button onclick="convertToExpense({{ $quote->id }})" class="text-green-400 hover:text-green-300">
                                         Convertir en dépense

@@ -10,22 +10,23 @@ class CustomersController extends Controller
      */
     public function index(Request $request)
     {
+        $userId = auth()->id(); // Récupère l'ID de l'utilisateur connecté
+
         $search = $request->input('search');
-        $sort = $request->input('sort', 'name'); // Tri par défaut sur le nom
-        $direction = $request->input('direction', 'asc'); // Direction par défaut croissante
-        
-        // Validation des colonnes autorisées pour le tri
+        $sort = $request->input('sort', 'name'); // Tri par défaut
+        $direction = $request->input('direction', 'asc');
+
         $allowedSorts = ['name', 'email', 'phone', 'address'];
         if (!in_array($sort, $allowedSorts)) {
             $sort = 'name';
         }
-        
-        // Validation de la direction
+
         if (!in_array($direction, ['asc', 'desc'])) {
             $direction = 'asc';
         }
-        
+
         $customers = Customer::query()
+            ->where('user_id', $userId) // 🔒 Restriction par utilisateur
             ->when($search, function ($query, $search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('email', 'like', '%' . $search . '%')
@@ -35,9 +36,10 @@ class CustomersController extends Controller
             ->orderBy($sort, $direction)
             ->withCount('projects')
             ->paginate(10);
-        
-        return view('customers.index', compact('customers', 'search'));
+
+        return view('customers.index', compact('customers', 'search', 'sort', 'direction'));
     }
+
 
     /**
      * Show the form for creating a new customer.

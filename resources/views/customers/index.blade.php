@@ -5,7 +5,7 @@
     <div class="bg-gray-800 rounded-3xl p-8 shadow-2xl">
         <!-- Header Section -->
         <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-medium text-red-400">All Customers</h1>
+            <h1 class="text-2xl font-medium text-red-400">Clients</h1>
 
             <div class="flex items-center space-x-4">
                 <!-- Search -->
@@ -26,7 +26,7 @@
 
                 <!-- Add Button -->
                 <a href="{{ route('customers.create') }}"
-                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">Add Customer</a>
+                    class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-500 transition-colors">Ajouter un client</a>
             </div>
         </div>
 
@@ -39,7 +39,7 @@
                         <th class="py-4 px-2 text-left text-red-400">
                             <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'name', 'direction' => (request('sort') == 'name' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
                                class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Name</span>
+                                <span>Nom du client</span>
                                 @if(request('sort') == 'name')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -85,7 +85,7 @@
                         <th class="py-4 px-2 text-left text-red-400">
                             <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'phone', 'direction' => (request('sort') == 'phone' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
                                class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Phone</span>
+                                <span>Téléphone</span>
                                 @if(request('sort') == 'phone')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -108,7 +108,7 @@
                         <th class="py-4 px-2 text-left text-red-400">
                             <a href="{{ route('customers.index', array_merge(request()->all(), ['sort' => 'address', 'direction' => (request('sort') == 'address' && request('direction') == 'asc') ? 'desc' : 'asc'])) }}" 
                                class="flex items-center space-x-1 hover:text-red-300 transition-colors">
-                                <span>Address</span>
+                                <span>Adresse</span>
                                 @if(request('sort') == 'address')
                                     @if(request('direction') == 'asc')
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

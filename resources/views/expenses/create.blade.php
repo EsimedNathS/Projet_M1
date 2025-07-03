@@ -37,7 +37,7 @@
                             <option value="">-- Sélectionnez un devis --</option>
                             @foreach($availableQuotes as $availableQuote)
                                 <option value="{{ $availableQuote->id }}">
-                                    Devis #{{ $availableQuote->id }} - {{ $availableQuote->description }} ({{ number_format($availableQuote->amount, 2) }} €)
+                                    Devis #{{ $availableQuote->id }} - {{ $availableQuote->description }} ({{ number_format($availableQuote->calculateAmount(), 2) }} €)
                                 </option>
                             @endforeach
                         </select>
@@ -54,6 +54,7 @@
 
             <form action="{{ route('expenses.store') }}" method="POST">
                 @csrf
+                <input type="hidden" name="status_id" value="{{ 1 }}">
 
                 @if(isset($quote))
                     <input type="hidden" name="quote_id" value="{{ $quote->id }}">
@@ -77,14 +78,14 @@
                             @enderror
                         </div>
                         @if ($errors->any())
-    <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+                            <div class="bg-red-100 text-red-800 p-4 rounded mb-4">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
 
                         <div class="mb-4">
                             <label for="date_payment_limit" class="block mb-2 text-red-400">Date de paiement limite</label>
@@ -147,7 +148,7 @@
                         @endif
 
                         <div class="mb-4">
-                            <label for="expense_number" class="block mb-2 text-red-400">Numéro de dépense</label>
+                            <label for="expense_number" class="block mb-2 text-red-400">Numéro de facture</label>
                             <input type="text" name="expense_number" id="expense_number" 
                                 value="{{ old('expense_number', $suggestedNumber) }}"
                                 class="w-full p-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-white" 

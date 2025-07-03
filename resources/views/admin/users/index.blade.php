@@ -20,7 +20,7 @@
                 <td class="p-4">{{ $user->email }}</td>
                 <td class="p-4">{{ $user->admin }}</td>
                 <td class="p-4">
-                    <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-400 hover:underline">Modifier</a>
+                    <!-- <a href="{{ route('admin.users.edit', $user) }}" class="text-blue-400 hover:underline">Modifier</a> -->
                     <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="inline-block ml-2"
                           onsubmit="return confirm('Supprimer cet utilisateur ?')">
                         @csrf

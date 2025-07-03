@@ -13,19 +13,22 @@ class QuotesController extends Controller
 {
     public function index(Request $request)
     {
+        $userId = auth()->id();
+
         $search = $request->input('search');
         $sort = $request->input('sort');
-        $direction = $request->input('direction', 'asc'); // Par défaut 'asc'
+        $direction = $request->input('direction', 'asc');
 
-        $quotesQuery = Quotes::query()->with(['status', 'project']);
+        $quotesQuery = Quotes::with(['status', 'project'])
+            ->whereHas('project.customer', function ($q) use ($userId) {
+                $q->where('user_id', $userId);
+            });
 
-        // Recherche
         if ($search) {
             $quotesQuery->where('description', 'like', '%' . $search . '%');
         }
 
-        // Tri avec direction
-        if ($sort) {    
+        if ($sort) {
             if ($sort === 'status') {
                 $quotesQuery->join('quotes_status', 'quotes.status_id', '=', 'quotes_status.id')
                             ->orderBy('quotes_status.name', $direction);
@@ -39,11 +42,11 @@ class QuotesController extends Controller
             $quotesQuery->orderByDesc('date_edition');
         }
 
-        // Pagination avec relations chargées
         $quotes = $quotesQuery->paginate(10)->withQueryString();
 
         return view('quotes.index', compact('quotes', 'search', 'sort', 'direction'));
     }
+
 
     // Scope pour les quotes acceptées
     public function scopeAccepted($query)
@@ -103,6 +106,14 @@ class QuotesController extends Controller
                 'wording' => $line['wording'],
                 'unit_price' => $line['unit_price'],
                 'quantity' => $line['quantity'],
+            ]);
+        }
+
+        $project = Project::find($quote->project_id);
+
+        if ($project && $quote->status_id > $project->status_id) {
+            $project->update([
+                'status_id' => $quote->status_id
             ]);
         }
 
@@ -230,26 +241,41 @@ class QuotesController extends Controller
 
     public function sendQuote(Quotes $quote)
     {
-        // Exemple simple : changer le statut en "Envoyé"
         $acceptedStatus = QuotesStatus::where('name', 'Envoyé')->first();
+
         if ($acceptedStatus) {
             $quote->status_id = $acceptedStatus->id;
             $quote->save();
+
+            // Mettre à jour le projet si nécessaire
+            $project = $quote->project;
+            if ($project && $quote->status_id > $project->status_id) {
+                $project->update(['status_id' => $quote->status_id]);
+            }
         }
 
         return redirect()->back()->with('success', 'Le devis a été envoyé.');
     }
 
+
     public function validateQuote(Quotes $quote)
     {
         $acceptedStatus = QuotesStatus::where('name', 'Validé')->first();
+
         if ($acceptedStatus) {
             $quote->status_id = $acceptedStatus->id;
             $quote->save();
+
+            // Mettre à jour le projet si nécessaire
+            $project = $quote->project;
+            if ($project && $quote->status_id > $project->status_id) {
+                $project->update(['status_id' => $quote->status_id]);
+            }
         }
 
         return redirect()->back()->with('success', 'Le devis a été validé.');
     }
+
 
 
 }

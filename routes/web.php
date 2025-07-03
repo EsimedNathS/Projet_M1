@@ -10,7 +10,6 @@ use App\Http\Controllers\QuoteLineController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -20,11 +19,18 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    
+    // Routes pour les profils utilisateur (accessible aux utilisateurs connectés)
+    Route::get('/users/{user}', [UserController::class, 'show'])->name('user.show');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('user.edit');
+    Route::patch('/users/{user}', [UserController::class, 'update'])->name('user.update');
 });
 
+// Routes admin (gestion complète des utilisateurs)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('users', UserController::class);
 });
@@ -45,9 +51,9 @@ Route::prefix('quotes/{quote}')->group(function () {
 });
 
 Route::resource('quotes.lines', QuoteLineController::class)->except(['index', 'show']);
+
 Route::post('/quotes/{quote}/validate', [QuotesController::class, 'validateQuote'])->name('quotes.validate');
 Route::post('/quotes/{quote}/send', [QuotesController::class, 'sendQuote'])->name('quotes.send');
-
 
 // Routes quotes dans projet avec noms différents pour éviter collision
 Route::prefix('projects/{project}')->group(function () {
@@ -57,7 +63,6 @@ Route::prefix('projects/{project}')->group(function () {
     Route::put('quotes/{quote}', [QuotesController::class, 'update'])->name('projects.quotes.update');
 });
 
-Route::get('/expenses/{id}/download', [ExpenseController::class, 'downloadInvoice'])->name('expenses.download');
+Route::get('/expenses/{id}/download', [ExpensesController::class, 'downloadInvoice'])->name('expenses.download');
 
 require __DIR__.'/auth.php';
-
